@@ -25,6 +25,7 @@ public class PlayerClient : NetworkBehaviour
         {
             m_StarterAssetsInputs.enabled = true;
             m_PlayerInput.enabled = true;
+           
         }
 
         if (IsServer)
