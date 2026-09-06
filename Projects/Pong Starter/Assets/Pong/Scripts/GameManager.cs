@@ -39,14 +39,18 @@ public class GameManager : NetworkBehaviour
         _leftPlayerScore.OnValueChanged -= HandleScoreChanged;
         _rightPlayerScore.OnValueChanged -= HandleScoreChanged;
         if (IsServer && NetworkManager != null)
+        {
             NetworkManager.OnConnectionEvent -= HandleConnectionEvent;
+        }
     }
+        
     
     void HandleConnectionEvent(NetworkManager manager, ConnectionEventData eventData)
     {
-        if (eventData.EventType == ConnectionEvent.ClientConnected &&
-            manager.ConnectedClientsIds.Count == 2)
-            StartGame();
+        if (eventData.EventType == ConnectionEvent.ClientConnected && manager.ConnectedClientsIds.Count == 2)
+        {
+            StartGame();            
+        }
     }
     
     void Start()

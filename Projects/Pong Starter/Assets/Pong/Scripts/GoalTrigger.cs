@@ -15,6 +15,8 @@ public class GoalTrigger : NetworkBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (IsServer && other.gameObject.CompareTag("Ball"))
+        {
             gameManager.OnGoalScored(scoringSide);
+        }
     }
 }
