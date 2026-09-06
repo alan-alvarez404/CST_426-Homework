@@ -1227,6 +1227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88f90280976428e468b6c3cbc5378a4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   gameManager: {fileID: 1677812269}
   scoringSide: 0
 --- !u!1 &653043937
@@ -1239,6 +1240,7 @@ GameObject:
   m_Component:
   - component: {fileID: 653043939}
   - component: {fileID: 653043938}
+  - component: {fileID: 653043941}
   - component: {fileID: 653043940}
   m_Layer: 0
   m_Name: Left Goal
@@ -1295,8 +1297,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88f90280976428e468b6c3cbc5378a4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   gameManager: {fileID: 1677812269}
   scoringSide: 1
+--- !u!114 &653043941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653043937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 940653391
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &700651426
 GameObject:
   m_ObjectHideFlags: 0
@@ -2243,6 +2272,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1567325795}
+  - component: {fileID: 1567325797}
   - component: {fileID: 1567325796}
   m_Layer: 0
   m_Name: Session Manager
@@ -2278,11 +2308,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3227241d9baa7c4a92269473acbe6bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SessionManager
+  ShowTopMostFoldoutHeaderGroup: 1
   gameManager: {fileID: 1677812269}
   networkManager: {fileID: 2143471857}
   startHostButton: {fileID: 106550600}
   startClientButton: {fileID: 1483414517}
   sessionUI: {fileID: 427943453}
+--- !u!114 &1567325797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567325793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 2833618960
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &1677812267
 GameObject:
   m_ObjectHideFlags: 0
@@ -2815,6 +2872,7 @@ GameObject:
   - component: {fileID: 3100000003}
   - component: {fileID: 3100000004}
   - component: {fileID: 3100000005}
+  - component: {fileID: 3100000007}
   - component: {fileID: 3100000006}
   m_Layer: 0
   m_Name: Left Paddle
@@ -2928,6 +2986,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e88dbd3ab2cb36419b0aea5ef31ca7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   side: 0
   minTravelZ: -3
   maxTravelZ: 3
@@ -2935,6 +2994,32 @@ MonoBehaviour:
   collisionBallSpeedUp: 1.5
   moveUpKey: 37
   moveDownKey: 33
+--- !u!114 &3100000007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3100000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 2011123093
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &3100000011
 GameObject:
   m_ObjectHideFlags: 0
@@ -2947,6 +3032,7 @@ GameObject:
   - component: {fileID: 3100000013}
   - component: {fileID: 3100000014}
   - component: {fileID: 3100000015}
+  - component: {fileID: 3100000017}
   - component: {fileID: 3100000016}
   m_Layer: 0
   m_Name: Right Paddle
@@ -3060,6 +3146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e88dbd3ab2cb36419b0aea5ef31ca7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   side: 1
   minTravelZ: -3
   maxTravelZ: 3
@@ -3067,6 +3154,32 @@ MonoBehaviour:
   collisionBallSpeedUp: 1.5
   moveUpKey: 63
   moveDownKey: 64
+--- !u!114 &3100000017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3100000011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 2025630027
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

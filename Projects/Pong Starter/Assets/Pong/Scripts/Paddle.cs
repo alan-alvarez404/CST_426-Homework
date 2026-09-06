@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,7 +19,7 @@ using UnityEngine.InputSystem;
  * prefab X if the table is centered at 0.
  */
 
-public class Paddle : MonoBehaviour
+public class Paddle : NetworkBehaviour
 {
     [SerializeField] PaddleSide side;
     [SerializeField] float minTravelZ;
@@ -31,6 +32,8 @@ public class Paddle : MonoBehaviour
     [SerializeField] Key moveUpKey = Key.W;
     [SerializeField] Key moveDownKey = Key.S;
 
+    readonly NetworkVariable<PaddleSide> _networkSide = new();
+    
     // Demo shortcut — see the class header note on LeftX / RightX.
     const float LeftX = -7.5f;
     const float RightX = 7.5f;
@@ -42,14 +45,43 @@ public class Paddle : MonoBehaviour
 
     void ApplySidePosition()
     {
-        float x = side == PaddleSide.Left ? LeftX : RightX;
+        PaddleSide currentSide = IsSpawned ? _networkSide.Value : side;
+        float x = currentSide == PaddleSide.Left ? LeftX : RightX;
+
         Vector3 paddlePos = transform.position;
         paddlePos.x = x;
         transform.position = paddlePos;
     }
 
+    void HandleSideChanged(PaddleSide previousSide, PaddleSide newSide)
+    {
+        ApplySidePosition();
+    }
+
+    
+    public override void OnNetworkSpawn()
+    {
+        _networkSide.OnValueChanged += HandleSideChanged;
+
+        if (IsServer)
+        {
+            _networkSide.Value = OwnerClientId == NetworkManager.ServerClientId
+                ? PaddleSide.Left : PaddleSide.Right;
+            ApplySidePosition();
+        }
+        else ApplySidePosition();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        _networkSide.OnValueChanged -= HandleSideChanged;   
+    }
+
+
     void Update()
     {
+        if (!IsOwner || Keyboard.current == null) return;
+
         float direction = 0f;
         if (Keyboard.current[moveUpKey].isPressed) direction += 1f;
         if (Keyboard.current[moveDownKey].isPressed) direction -= 1f;
@@ -62,6 +94,8 @@ public class Paddle : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
+        if (!IsServer || !other.gameObject.CompareTag("Ball")) return;
+        
         // Get world-space bounds
         var paddleBounds = GetComponent<BoxCollider>().bounds;
 

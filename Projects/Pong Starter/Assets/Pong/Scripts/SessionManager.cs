@@ -8,7 +8,7 @@ using UnityEngine.UI;
  * references mark where you will start a Host or Client session.
  */
 
-public class SessionManager : MonoBehaviour
+public class SessionManager : NetworkBehaviour
 {
     [Header("Multiplayer")]
     [SerializeField] GameManager gameManager;
@@ -24,9 +24,46 @@ public class SessionManager : MonoBehaviour
     void Awake()
     {
         // Hide Host/Client until you are ready to wire the session.
-        sessionUI.gameObject.SetActive(false);
+        //sessionUI.gameObject.SetActive(false);
+        sessionUI.gameObject.SetActive(true);
         
-        startHostButton.onClick.AddListener(() => Debug.Log("TODO: Start Host"));
-        startClientButton.onClick.AddListener(() => Debug.Log("TODO: Start Client"));
+        //startHostButton.onClick.AddListener(() => Debug.Log("TODO: Start Host"));
+        //startClientButton.onClick.AddListener(() => Debug.Log("TODO: Start Client"));
+        
+        startHostButton.onClick.AddListener(StartHost);
+        startClientButton.onClick.AddListener(StartClient);
     }
+    
+    
+    void OnDestroy()
+    {
+        if (startHostButton != null) startHostButton.onClick.RemoveListener(StartHost);
+        if (startClientButton != null) startClientButton.onClick.RemoveListener(StartClient);
+    }
+
+    public void StartHost()
+    {
+        if (networkManager != null && !networkManager.IsListening) networkManager.StartHost();
+        SetButtons(false);
+    }
+
+    public void StartClient()
+    {
+        if (networkManager != null && !networkManager.IsListening) networkManager.StartClient();
+        SetButtons(false);
+    }
+
+    public void Disconnect()
+    {
+        networkManager?.Shutdown();
+        SetButtons(true);
+    }
+
+    void SetButtons(bool canStart)
+    {
+        if (startHostButton != null) startHostButton.interactable = canStart;
+        if (startClientButton != null) startClientButton.interactable = canStart;
+        if (sessionUI != null) sessionUI.gameObject.SetActive(canStart);
+    }
+
 }
