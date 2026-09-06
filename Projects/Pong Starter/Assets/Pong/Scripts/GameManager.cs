@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 /*
@@ -8,7 +9,7 @@ using UnityEngine;
  * score is synchronized to every client.
  */
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     [SerializeField] Transform ball;
     [SerializeField] float startSpeed = 3f;
