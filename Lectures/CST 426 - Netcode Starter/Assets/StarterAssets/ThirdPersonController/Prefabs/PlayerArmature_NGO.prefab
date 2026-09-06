@@ -2192,8 +2192,8 @@ GameObject:
   - component: {fileID: 5939096999834483967}
   - component: {fileID: -4020958229148340627}
   - component: {fileID: -3328809303543722741}
-  - component: {fileID: 1175238290154808370}
-  - component: {fileID: -2625158824491933131}
+  - component: {fileID: 5437744878347710492}
+  - component: {fileID: -31446200297554886}
   m_Layer: 8
   m_Name: PlayerArmature_NGO
   m_TagString: Player
@@ -2464,7 +2464,7 @@ MonoBehaviour:
   m_PlayerInput: {fileID: 5939096999834483967}
   m_StarterAssetsInputs: {fileID: 5946244198763126136}
   m_ThirdPersonController: {fileID: 4507998660513972962}
---- !u!114 &1175238290154808370
+--- !u!114 &5437744878347710492
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2473,11 +2473,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6489010780293314777}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34636508fd8358447a71d5cada523383, type: 3}
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ClientNetworkTransform
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
   ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 1
+  NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 0
   RotationInterpolationType: 0
@@ -2495,7 +2495,7 @@ MonoBehaviour:
   SyncPositionY: 1
   SyncPositionZ: 1
   SyncRotAngleX: 0
-  SyncRotAngleY: 0
+  SyncRotAngleY: 1
   SyncRotAngleZ: 0
   SyncScaleX: 0
   SyncScaleY: 0
@@ -2510,7 +2510,7 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &-2625158824491933131
+--- !u!114 &-31446200297554886
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2519,9 +2519,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6489010780293314777}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f066d01c96945c340b8b2a4da4f658c4, type: 3}
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ClientNetworkAnimator
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkAnimator
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkAnimatorExpanded: 0
   AuthorityMode: 0
