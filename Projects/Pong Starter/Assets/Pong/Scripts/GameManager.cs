@@ -70,7 +70,7 @@ public class GameManager : NetworkBehaviour
     public void OnGoalScored(PaddleSide scoringSide)
     {
         if (!IsServer) return;
-
+        
         
         // If the ball entered a goal area, increment the score, check for win, and reset the ball
 
