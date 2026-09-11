@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -52,6 +53,11 @@ public class PlayerController : NetworkBehaviour
         // TODO Slice 6.2: detect a target and request interaction on E or left-click.
         // Check: Play Mode, Host, highlight the axe, press E.
         // The Interact clip plays. The axe stays on the ground.
+        if (Keyboard.current.eKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            HandleInteractionPressed();
+        }
+        
     }
 
 
@@ -83,6 +89,13 @@ public class PlayerController : NetworkBehaviour
         // TODO Slice 6.1: if there is no target, return. Otherwise fire the
         // Animator's "Interact" trigger and send the target's NetworkObjectId
         // to the server.
+
+        if (_closestTarget == null) return;
+        
+        _animator.SetTrigger("Interact");
+        
+        RequestInteractRpc(_closestTarget.NetworkObjectId);
+        
     }
 
     static Vector2 ReadMovementInput()
@@ -167,10 +180,29 @@ public class PlayerController : NetworkBehaviour
     [Rpc(SendTo.Server)]
     void RequestInteractRpc(ulong networkObjectId)
     {
+        Debug.Log("Requesting Interact on server for {networkObjectId}");
+        
         // TODO Slice 6.3: look up networkObjectId in SpawnedObjects. If that
         // object is gone, return. It may have despawned after you selected it.
         // If it has an Interactable, call ServerInteract(_heldItem).
+        Dictionary<ulong, NetworkObject> spawnedObjectMap = NetworkManager.SpawnManager.SpawnedObjects;
+        if (!spawnedObjectMap.TryGetValue(networkObjectId, out NetworkObject spawnedObject))
+        {
+            Debug.LogError($"Couldn't find spawned object: {networkObjectId}");
+            return;
+        }
 
+        if (!spawnedObject.TryGetComponent(out Interactable interactable))
+        {
+            Debug.LogError("Object doesn't have interactable");
+            return;
+        }
+
+        if (interactable.CanInteract(_heldItem.ObjectType))
+        {
+            interactable.ServerInteract(_heldItem);
+        }
+        
         // Check: E still only plays Interact. Console stays clean. The pickup
         // (e.g. axe) does not move yet.
 
