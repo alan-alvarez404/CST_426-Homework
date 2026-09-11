@@ -1438,6 +1438,10 @@ PrefabInstance:
       propertyPath: _selectionColor.r
       value: 5.3403134
       objectReference: {fileID: 0}
+    - target: {fileID: 5698121921420260992, guid: 0f593c205eb9e5a48825e85731d1f215, type: 3}
+      propertyPath: _objectType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6516417003874187964, guid: 0f593c205eb9e5a48825e85731d1f215, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3447903168
@@ -2016,6 +2020,10 @@ PrefabInstance:
     - target: {fileID: 4217106867965326089, guid: 73dbe4cc9c782f74db20a3ec1e60a2f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6946354652643703264, guid: 73dbe4cc9c782f74db20a3ec1e60a2f5, type: 3}
+      propertyPath: _acceptedObjectType
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
