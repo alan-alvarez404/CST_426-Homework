@@ -180,7 +180,7 @@ public class PlayerController : NetworkBehaviour
     [Rpc(SendTo.Server)]
     void RequestInteractRpc(ulong networkObjectId)
     {
-        Debug.Log("Requesting Interact on server for {networkObjectId}");
+        Debug.Log($"Requesting Interact on server for {networkObjectId}");
         
         // TODO Slice 6.3: look up networkObjectId in SpawnedObjects. If that
         // object is gone, return. It may have despawned after you selected it.
