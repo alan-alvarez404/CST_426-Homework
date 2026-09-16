@@ -90,6 +90,22 @@ public class ResourceNode : Interactable
         // 4. Place each with a small random XZ offset and random yaw.
         // Check: axe the tree. Wood appears. The mesh is still there until 8.4.
 
+        if (_health.Value <= 0)
+        {
+            for (int i = 0; i < _amountToSpawn; i++)
+            {
+                Vector2 offset = Random.insideUnitCircle * 1.0f;
+                Vector3 spawnPosition = transform.position + new Vector3(offset.x, 0.5f, offset.y);
+                Quaternion spawnRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+
+                NetworkObject.InstantiateAndSpawn(
+                    _producedPrefab.gameObject,
+                    NetworkManager,
+                    position: spawnPosition,
+                    rotation: spawnRotation);
+            }
+        }
+        
         // Next: Slice 8.4 HandleHealthChanged.
 
     }

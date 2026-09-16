@@ -16,7 +16,12 @@ public class ItemPickup : Interactable
     {
         base.OnNetworkDespawn();
 
-        // Despawn(false) leaves the GameObject active and visible. Netcode also
+        Debug.Log(
+            $"{name} spawned on {(IsServer ? "server" : "client")} " +
+            $"at {transform.position}"
+        );
+        
+        // Despawn(false) leaves the GameOb ject active and visible. Netcode also
         // runs this callback on a late joiner's copy of a taken scene pickup.
         if (NetworkObject.InScenePlaced && !NetworkManager.ShutdownInProgress)
             gameObject.SetActive(false);

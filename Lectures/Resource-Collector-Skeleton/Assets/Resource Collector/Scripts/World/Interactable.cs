@@ -20,6 +20,8 @@ public abstract class Interactable : NetworkBehaviour
         // TODO Slice 6.4: validate CanInteract before calling the subclass behavior.
         // Next: Slice 6.5 in ItemPickup.Interact.
         
+        if (!CanInteract(heldItem.ObjectType)) return;
+        
         Interact(heldItem);
     }
 
