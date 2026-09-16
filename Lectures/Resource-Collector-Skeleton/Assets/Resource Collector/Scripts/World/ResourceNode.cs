@@ -26,8 +26,8 @@ public class ResourceNode : Interactable
         // NOTE: make sure  NetworkObject.Despawn(!NetworkObject.InScenePlaced); is done
         // Next: Slice 8.2 CanInteract.
 
-        if(!IsServer) return;
-        _health.Value = _startingHealth;
+        if (IsServer)
+            _health.Value = _startingHealth;
         
         // TODO Slice 8.5: subscribe to health changes and apply the current health.
         // Check: both windows hide a depleted tree. A late joiner sees it hidden.
@@ -42,6 +42,8 @@ public class ResourceNode : Interactable
             renderer.enabled = !isDepleted;
         foreach (var collider in GetComponentsInChildren<Collider>())
             collider.enabled = !isDepleted;
+        
+        HandleHealthChanged(_health.Value, _health.Value);
     }
 
     public override void OnNetworkDespawn()
@@ -96,8 +98,8 @@ public class ResourceNode : Interactable
     void HitFeedbackRpc()
     {
         // TODO Slice 8.6: play the authored hit sound on each observer.
-        
-        
+        if (_audioClip != null)
+            AudioSource.PlayClipAtPoint(_audioClip, transform.position);
     }
 
     void HandleHealthChanged(int previousValue, int newValue)
