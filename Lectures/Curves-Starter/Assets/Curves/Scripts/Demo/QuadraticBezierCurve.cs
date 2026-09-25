@@ -15,12 +15,24 @@ public class QuadraticBezierCurve : MonoBehaviour
 
     public int numSamples = 10;
 
-    void Start()
+    void Update()
     {
         // TODO Slice 1.7: draw this curve in its LineRenderer with numSamples points.
         // Space them evenly in t and include both endpoints.
         // Check: restart Play Mode. The line matches the Scene-view gizmos.
         // Next: Slice 2.1 in FollowCurve.cs. </> end of Slice 1
+        LineRenderer lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.positionCount = numSamples;
+
+        QuadraticBezierMath.ComputePowerBasisCoefficients(p0.position, p1.position, p2.position, out Vector3 c0, out Vector3 c1, out Vector3 c2);
+        
+        for (int i = 0; i < numSamples; i++)
+        {
+            float t = (float)i / (numSamples - 1);
+            //lineRenderer.SetPosition(i, QuadraticBezierMath.SamplePointPowerBasis(c0, c1, c2, t));
+            Vector3 samplePosition = SamplePoint(t);
+            lineRenderer.SetPosition(i, samplePosition);
+        }
 
         // TODO Slice 7.3 (upgrade 1.7): draw the line with power-basis evaluation.
         // Prepare the coefficients once, outside the sample loop.
@@ -47,8 +59,8 @@ public class QuadraticBezierCurve : MonoBehaviour
         // Check: SceneCurve_SamplesCurrentWorldPointsWithoutCallbacks(False,False) passes.
         // Next: Slice 1.6 in CurveGizmos.cs.
         
-        Vector3 sample = QuadraticBezierMath.SamplePointDeCasteljau(p0.position, p1.position, p2.position, t);
-
+        Vector3 sample = QuadraticBezierMath.SamplePointBernstein(p0.position, p1.position, p2.position, t);
+        
         // TODO Slice 6.2 (upgrade 1.5): switch to your Bernstein evaluator.
         // Check: the curve and follower look the same. This method calls Bernstein; keep it.
         // Next: Slice 6.3 in Bezier/QuadraticBezierMath.cs.
@@ -65,6 +77,6 @@ public class QuadraticBezierCurve : MonoBehaviour
         // TODO Slice 6.4 (upgrade 2.3): switch to your Bernstein derivative.
         // Check: the follower faces the same way. This method calls Bernstein; keep it.
         // Next: Slice 7.1 in Bezier/QuadraticBezierMath.cs. </> end of Slice 6
-        return Vector3.zero;
-    }
+        
+        return QuadraticBezierMath.SampleTangentBernstein(p0.position, p1.position, p2.position, t);    }
 }

@@ -116,7 +116,28 @@ public class PlayerController : MonoBehaviour
         // follow the moving hand.
         // Check: turn during recall. The axe still lands in the animated grip.
         // Next: open Demo, Slice 6.1 in Bezier/QuadraticBezierMath.cs.
-        yield return null;
+        float elapsed = 0f;
+        do
+        {
+            // elapsed += Time.deltaTime;
+            // float t = returnDuration <= 0f ? 1f : Mathf.Clamp01(elapsed / returnDuration);
+            // (Vector3 p0, Vector3 p1, Vector3 p2) = GetReturnControlPoints(start);
+            // axe.transform.position = QuadraticBezierMath.SamplePointBernstein(p0, p1, p2, t);
+            // yield return null;
+            
+            float t = elapsed / returnDuration;
+            Vector3 p0 = axe.transform.position;
+            Vector3 p2 = axe.CatchPosition;
+            Vector3 p1 = (p0 + p2) * 0.5f + transform.right;
+            
+            axe.transform.position = QuadraticBezierMath.SamplePointBernstein(p0, p1, p2, t);
+            axe.transform.Rotate(Vector3.forward, axe.spinSpeed * Time.deltaTime, Space.Self);
+            
+            yield return null;
+            elapsed += Time.deltaTime;
+            
+        }
+        while (elapsed < returnDuration);
 
         axe.AttachToHand();
         _axeState = AxeState.Held;
@@ -128,6 +149,13 @@ public class PlayerController : MonoBehaviour
         // TODO Slice 5.1: bow the return curve sideways to the axe-to-hand direction.
         // bowAmount controls how far.
         // Next: Slice 5.2 in DrawReturnPath, where you can see the bow.
+        Vector3 direction = end - start;
+        Vector3 sideways = Vector3.Cross(Vector3.up, direction);
+        if (sideways.sqrMagnitude > 0.000001f)
+        {
+            sideways.Normalize();
+        }
+        
         Vector3 middle = (start + end) * 0.5f;
         return (start, middle, end);
     }
@@ -169,6 +197,14 @@ public class PlayerController : MonoBehaviour
         // Check: throw. While Away, the preview bows from the axe to the hand.
         // Changing bowAmount changes the bow.
         // Next: Slice 5.3 in ReturnAxe.
-        _lineRenderer.positionCount = 0;
+        (Vector3 p0, Vector3 p1, Vector3 p2) = GetReturnControlPoints(axe.transform.position);
+        const int samples = 10;
+        _lineRenderer.positionCount = samples;
+
+        for (int i = 0; i < samples; i++)
+        {
+            float t = (float)i / (samples - 1);
+            _lineRenderer.SetPosition(i, QuadraticBezierMath.SamplePointBernstein(p0, p1, p2, t));
+        }
     }
 }

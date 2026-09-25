@@ -13,7 +13,13 @@ public static class CubicBezierMath
         // Check: DeCasteljauCubic_SamplesPointFromEquivalentCubicFormula passes.
         // Next: Slice 3.2 in Demo/CubicBezierCurve.cs.
         
-        return Vector3.zero;
+        Vector3 a = Vector3.Lerp(p0, p1, t);
+        Vector3 b = Vector3.Lerp(p1, p2, t);
+        Vector3 c = Vector3.Lerp(p2, p3, t);
+        Vector3 d = Vector3.Lerp(a, b, t);
+        Vector3 e = Vector3.Lerp(b, c, t);
+        
+        return Vector3.Lerp(d, e, t);
     }
 
     public static Vector3 SampleTangent(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
@@ -24,6 +30,13 @@ public static class CubicBezierMath
         // to t using the product rule. Explain each step." Then derive it yourself.
         // Check: DeCasteljauCubic_SamplesTangentFromFinalInterpolationSegment passes.
         // Next: Slice 3.6 in Demo/CubicBezierCurve.cs.
-        return Vector3.zero;
+        
+        Vector3 a = Vector3.Lerp(p0, p1, t);
+        Vector3 b = Vector3.Lerp(p1, p2, t);
+        Vector3 c = Vector3.Lerp(p2, p3, t);
+        Vector3 d = Vector3.Lerp(a, b, t);
+        Vector3 e = Vector3.Lerp(b, c, t);
+
+        return 3f * (e - d);
     }
 }
