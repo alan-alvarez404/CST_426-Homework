@@ -25,10 +25,36 @@ public class PlayerController : NetworkBehaviour
     [Header("Movement")]
     [SerializeField] float _movementSpeed = 4f;
     [SerializeField] float _rotationSpeed = 200f;
+    
+    // For the line that shows up when holding the axe
+    [Header("Aiming")]
+    [SerializeField] LineRenderer _aimLine;
+    [SerializeField] Transform _aimOrigin;
+    [SerializeField] float _aimDistance = 10f;
+    [SerializeField] LayerMask _aimLayer = ~0;
+    
+    // TODO: Use these at some point
+    // These will be unused for now, but once I can get all the other necessary stuff from the throwing project we should be good
+    [Header("Axe")]
+    public float throwImpulse = 25f;
+    public float returnDuration = 1f;
+    public float bowAmount = 0.5f;
 
     Interactable _closestTarget;
     Vector2 _smoothedInput;
 
+    void Awake()
+    {
+        if (_aimLine == null)
+            _aimLine = GetComponent<LineRenderer>();
+
+        if (_aimLine != null)
+        {
+            _aimLine.useWorldSpace = true;
+            _aimLine.positionCount = 0;
+        }
+    }
+    
     void Update()
     {
         if (!IsOwner) return;
@@ -49,6 +75,7 @@ public class PlayerController : NetworkBehaviour
         _animator.SetFloat("Speed", _characterController.velocity.magnitude);
 
         UpdateInteractionTarget();
+        UpdateAimVisual(); // For the targeting aim line
         
         // TODO Slice 6.2: detect a target and request interaction on E or left-click.
         // Check: Play Mode, Host, highlight the axe, press E.
@@ -68,6 +95,8 @@ public class PlayerController : NetworkBehaviour
         // TODO Slice 2.6: make the main camera follow only its local player. </> end of Slice 2
         if (IsOwner)
             Camera.main.GetComponent<FollowCamera>().Target = transform;
+        else if (_aimLine != null)
+            _aimLine.positionCount = 0;
     }
 
     public override void OnNetworkDespawn()
@@ -82,6 +111,32 @@ public class PlayerController : NetworkBehaviour
         base.OnNetworkDespawn();
     }
 
+    // Function to handle the aiming visual when wielding an axe
+    void UpdateAimVisual()
+    {
+        if (_aimLine == null) return;
+
+        bool holdingAxe = _heldItem.ObjectType == ObjectType.Axe;
+        if (!holdingAxe)
+        {
+            _aimLine.positionCount = 0;
+            return;
+        }
+
+        Vector3 origin = _aimOrigin != null ? _aimOrigin.position : transform.position + Vector3.up;
+        Vector3 direction = transform.forward;
+        Vector3 end = origin + direction * _aimDistance;
+
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, _aimDistance, _aimLayer, QueryTriggerInteraction.Ignore))
+        {
+            end = hit.point;
+        }
+
+        _aimLine.positionCount = 2;
+        _aimLine.SetPosition(0, origin);
+        _aimLine.SetPosition(1, end);
+    }
+    
     void HandleInteractionPressed()
     {
         if (!IsOwner) return;
