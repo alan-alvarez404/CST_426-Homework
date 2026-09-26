@@ -119,12 +119,6 @@ public class PlayerController : MonoBehaviour
         float elapsed = 0f;
         do
         {
-            // elapsed += Time.deltaTime;
-            // float t = returnDuration <= 0f ? 1f : Mathf.Clamp01(elapsed / returnDuration);
-            // (Vector3 p0, Vector3 p1, Vector3 p2) = GetReturnControlPoints(start);
-            // axe.transform.position = QuadraticBezierMath.SamplePointBernstein(p0, p1, p2, t);
-            // yield return null;
-            
             float t = elapsed / returnDuration;
             Vector3 p0 = start;
             Vector3 p2 = axe.CatchPosition;
