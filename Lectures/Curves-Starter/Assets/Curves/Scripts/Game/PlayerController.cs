@@ -126,9 +126,9 @@ public class PlayerController : MonoBehaviour
             // yield return null;
             
             float t = elapsed / returnDuration;
-            Vector3 p0 = axe.transform.position;
+            Vector3 p0 = start;
             Vector3 p2 = axe.CatchPosition;
-            Vector3 p1 = (p0 + p2) * 0.5f + transform.right;
+            Vector3 p1 = (p0 + p2) * 0.5f + transform.right * bowAmount;
             
             axe.transform.position = QuadraticBezierMath.SamplePointBernstein(p0, p1, p2, t);
             axe.transform.Rotate(Vector3.forward, axe.spinSpeed * Time.deltaTime, Space.Self);

@@ -59,7 +59,7 @@ public class QuadraticBezierCurve : MonoBehaviour
         // Check: SceneCurve_SamplesCurrentWorldPointsWithoutCallbacks(False,False) passes.
         // Next: Slice 1.6 in CurveGizmos.cs.
         
-        Vector3 sample = QuadraticBezierMath.SamplePointBernstein(p0.position, p1.position, p2.position, t);
+        Vector3 sample = QuadraticBezierMath.SamplePointDeCasteljau(p0.position, p1.position, p2.position, t);
         
         // TODO Slice 6.2 (upgrade 1.5): switch to your Bernstein evaluator.
         // Check: the curve and follower look the same. This method calls Bernstein; keep it.

@@ -35,8 +35,6 @@ public class ThrownAxe : MonoBehaviour
         _heldLocalPosition = transform.localPosition;
         _heldLocalRotation = transform.localRotation;
         
-        transform.SetParent(null);
-        transform.position += direction * 0.5f;
         // TODO Slice 4.1: hand the detached axe to physics. Right now it hangs in the air.
         // 1. Let physics move it and let it collide with the world.
         // 2. Never let it collide with the thrower.
@@ -44,9 +42,14 @@ public class ThrownAxe : MonoBehaviour
         // Check: Launch_DetachesAndEnablesPhysicsWhileIgnoringThrower passes.
         // A throw flies and sticks on first contact.
         // Next: Slice 4.2 in OnCollisionEnter.
+        
+        Physics.IgnoreCollision(axeCollider, thrower);
+        transform.SetParent(null);
+        transform.position = direction;
+
         rigidbody.isKinematic = false;
         axeCollider.enabled = true;
-        Physics.IgnoreCollision(axeCollider, thrower, true);
+
         rigidbody.AddForce(direction * impulse, ForceMode.VelocityChange);
         rigidbody.AddTorque(transform.forward * (-spinSpeed * Mathf.Deg2Rad), ForceMode.VelocityChange);
 
