@@ -468,7 +468,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2402111284
+  GlobalObjectIdHash: 4229884011
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
@@ -508,10 +508,7 @@ MonoBehaviour:
   _rotationSpeed: 360
   _aimLine: {fileID: 1447521484990804271}
   _aimOrigin: {fileID: 3208710921996878769}
-  _aimDistance: 10
-  _aimLayer:
-    serializedVersion: 2
-    m_Bits: 64
+  axe: {fileID: 390180650161846094}
   throwImpulse: 25
   returnDuration: 1
   bowAmount: 0.5
@@ -1913,7 +1910,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  playerController: {fileID: 0}
+  playerController: {fileID: -9142553591360878985}
 --- !u!82 &1083908241827759264
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2049,6 +2046,14 @@ MonoBehaviour:
       NameHash: 1547809795
       Synchronize: 1
       ParameterType: 9
+    - name: Throw
+      NameHash: -1907200461
+      Synchronize: 1
+      ParameterType: 9
+    - name: IsAxeHeld
+      NameHash: 1897121326
+      Synchronize: 1
+      ParameterType: 4
   AnimatorParametersExpanded: 0
 --- !u!4 &2088593631293467040 stripped
 Transform:
@@ -2292,7 +2297,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e3ee26d99f87a743952fac7c150345e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7112066078202404487}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e3ee26d99f87a743952fac7c150345e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9006740196819976770}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e3ee26d99f87a743952fac7c150345e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 390180650161846094}
   m_SourcePrefab: {fileID: 100100000, guid: 1e3ee26d99f87a743952fac7c150345e, type: 3}
 --- !u!4 &7114200399526963433 stripped
 Transform:
@@ -2304,3 +2318,66 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e3ee26d99f87a743952fac7c150345e, type: 3}
   m_PrefabInstance: {fileID: 7291344218050678530}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &7112066078202404487
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7633996361503830611}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 0.59000003, y: 1.0699999, z: 0.19600007}
+  m_Center: {x: 0.1349997, y: 0.24999999, z: 0.000000017248777}
+--- !u!54 &9006740196819976770
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7633996361503830611}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 1
+--- !u!114 &390180650161846094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7633996361503830611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eed2dead1722f0145af6816e27ca7218, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ThrownAxe
+  rigidbody: {fileID: 9006740196819976770}
+  axeCollider: {fileID: 7112066078202404487}
+  spinSpeed: 1000

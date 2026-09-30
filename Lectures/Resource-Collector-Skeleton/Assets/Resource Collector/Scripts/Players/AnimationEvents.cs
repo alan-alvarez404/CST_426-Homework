@@ -15,8 +15,8 @@ public class AnimationEvents : MonoBehaviour
 
     public void ThrowAction()
     {
-        // TODO: Implement LaunchAxe then reenable this
-        // playerController.LaunchAxe();
+        // Implement LaunchAxe then reenable this - Done :thumbs_up:
+        playerController.LaunchAxe();
     }
 
     public void ChopAction() { }

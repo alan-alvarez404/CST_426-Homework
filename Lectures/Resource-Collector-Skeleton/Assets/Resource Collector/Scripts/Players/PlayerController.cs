@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,6 +12,10 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : NetworkBehaviour
 {
+    // Animator Components
+    static readonly int Speed = Animator.StringToHash("Speed");
+    static readonly int ThrowHash = Animator.StringToHash("Throw");
+    
     [Header("Components")]
     [SerializeField] CharacterController _characterController;
     [SerializeField] Animator _animator;
@@ -34,13 +39,18 @@ public class PlayerController : NetworkBehaviour
     
     // TODO: Use these at some point
     // These will be unused for now, but once I can get all the other necessary stuff from the throwing project we should be good
-    [Header("Axe")]
+    [Header("Axe")] 
+    public ThrownAxe axe;
     public float throwImpulse = 25f;
     public float returnDuration = 1f;
     public float bowAmount = 0.5f;
 
+    enum AxeState { Held, Throwing, Away, Returning }
+    
     Interactable _closestTarget;
     Vector2 _smoothedInput;
+    AxeState _axeState = AxeState.Held;
+    
     // For debug
     bool _lastAimHit;
     bool _hasAimHitState;
@@ -76,7 +86,11 @@ public class PlayerController : NetworkBehaviour
         // TODO Slice 2.4: set the "Speed" animator float so walk speed matches input.
         _animator.SetFloat("Speed", _characterController.velocity.magnitude);
 
+        // Make sure the animator receives an update for the axe being held
+        _animator.SetBool("IsAxeHeld", _heldItem.ObjectType == ObjectType.Axe && _axeState == AxeState.Held);
+        
         UpdateInteractionTarget();
+        UpdateAxeInput(); // For throwing the axe
         UpdateAimVisual(); // For the targeting aim line
         
         // TODO Slice 6.2: detect a target and request interaction on E or left-click.
@@ -113,6 +127,100 @@ public class PlayerController : NetworkBehaviour
         base.OnNetworkDespawn();
     }
 
+    
+    // =================================================================================================================
+    // These are all the functions related to axe throwing
+    
+    void UpdateAxeInput()
+    {
+        if (_axeState == AxeState.Held && Keyboard.current.tKey.wasPressedThisFrame)
+        {
+            _axeState = AxeState.Throwing;
+            _animator.SetTrigger(ThrowHash);
+        }
+
+        if (_axeState == AxeState.Away && Mouse.current.rightButton.wasPressedThisFrame)
+            StartCoroutine(ReturnAxe());
+    }
+
+    public void LaunchAxe()
+    {
+        if (_axeState != AxeState.Throwing) return;
+
+        Vector3 direction = transform.forward;
+        direction.y = 0f;
+        direction.Normalize();
+        axe.Launch(direction, throwImpulse, _characterController);
+        _axeState = AxeState.Away;
+    }
+
+    IEnumerator ReturnAxe()
+    {
+        _axeState = AxeState.Returning;
+        axe.rigidbody.isKinematic = true;
+        axe.axeCollider.enabled = false;
+        // TODO Slice 8.3 (recall hook): start visual spin for the return.
+        // Next: the Slice 8.3 catch hook in ThrownAxe.AttachToHand.
+
+        Vector3 start = axe.transform.position;
+        // TODO Slice 5.3: advance recall progress from 0 to 1 over returnDuration,
+        // one step per frame, replacing the one-frame wait below.
+        // The catch runs only after progress reaches 1.
+        // Check: a stuck or mid-flight axe waits returnDuration, then snaps to the hand.
+        // Next: Slice 5.4 below.
+
+        // TODO Slice 5.4: each frame, place the axe on the GetReturnControlPoints curve
+        // at the recall progress. The basic curve can stay fixed for the whole recall.
+        // Check: standing still, recall follows the preview's bow at two bowAmount values.
+        // Two full throw-and-recall cycles work, and so does recall mid-flight.
+        // Next: optional Slice 5.5 below, or open Demo, Slice 6.1 in
+        // Bezier/QuadraticBezierMath.cs. </> end of Slice 5
+
+        // TODO Slice 5.5 (optional): keep the start fixed; let the handle and end
+        // follow the moving hand.
+        // Check: turn during recall. The axe still lands in the animated grip.
+        // Next: open Demo, Slice 6.1 in Bezier/QuadraticBezierMath.cs.
+        float elapsed = 0f;
+        do
+        {
+            float t = elapsed / returnDuration;
+            Vector3 p0 = start;
+            Vector3 p2 = axe.CatchPosition;
+            Vector3 p1 = (p0 + p2) * 0.5f + transform.right * bowAmount;
+            
+            axe.transform.position = QuadraticBezierMath.SamplePointBernstein(p0, p1, p2, t);
+            axe.transform.Rotate(Vector3.forward, axe.spinSpeed * Time.deltaTime, Space.Self);
+            
+            yield return null;
+            elapsed += Time.deltaTime;
+            
+        }
+        while (elapsed < returnDuration);
+
+        axe.AttachToHand();
+        _axeState = AxeState.Held;
+    }
+
+    (Vector3 p0, Vector3 p1, Vector3 p2) GetReturnControlPoints(Vector3 start)
+    {
+        Vector3 end = axe.CatchPosition;
+        // TODO Slice 5.1: bow the return curve sideways to the axe-to-hand direction.
+        // bowAmount controls how far.
+        // Next: Slice 5.2 in DrawReturnPath, where you can see the bow.
+        Vector3 direction = end - start;
+        Vector3 sideways = Vector3.Cross(Vector3.up, direction);
+        if (sideways.sqrMagnitude > 0.000001f)
+        {
+            sideways.Normalize();
+        }
+        
+        Vector3 middle = (start + end) * 0.5f;
+        return (start, middle, end);
+    }
+    
+    // =================================================================================================================
+    
+    
     // Function to handle the aiming visual when wielding an axe
     void UpdateAimVisual()
     {

@@ -18,6 +18,19 @@ public class ThrownAxe : MonoBehaviour
     Vector3 _heldLocalPosition;
     Quaternion _heldLocalRotation;
 
+    // Ensure the axe starts as kinematic and its collider disabled
+    void Awake()
+    {
+        if (rigidbody == null)
+            rigidbody = GetComponent<Rigidbody>();
+
+        if (axeCollider == null)
+            axeCollider = GetComponent<Collider>();
+
+        rigidbody.isKinematic = true;
+        axeCollider.enabled = false;
+    }
+    
     // TODO Slice 8.1: give Assets/Curves/Prefabs/Axe.prefab a visual child that can rotate
     // on its own, separate from the physics root. Keep its look and collision the same.
     // Check: the held axe looks the same, and throw and catch still work.
