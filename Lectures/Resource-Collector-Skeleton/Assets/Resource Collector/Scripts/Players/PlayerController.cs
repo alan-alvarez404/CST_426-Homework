@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering.Universal;
 
 /*
  * PlayerController is the owner's local input loop: movement, target
@@ -30,8 +29,8 @@ public class PlayerController : NetworkBehaviour
     [Header("Aiming")]
     [SerializeField] LineRenderer _aimLine;
     [SerializeField] Transform _aimOrigin;
-    [SerializeField] float _aimDistance = 10f;
-    [SerializeField] LayerMask _aimLayer = ~0;
+    //[SerializeField] float _aimDistance = 10f;
+    //[SerializeField] private LayerMask _aimLayer = ~0;
     
     // TODO: Use these at some point
     // These will be unused for now, but once I can get all the other necessary stuff from the throwing project we should be good
@@ -42,6 +41,9 @@ public class PlayerController : NetworkBehaviour
 
     Interactable _closestTarget;
     Vector2 _smoothedInput;
+    // For debug
+    bool _lastAimHit;
+    bool _hasAimHitState;
 
     void Awake()
     {
@@ -120,21 +122,48 @@ public class PlayerController : NetworkBehaviour
         if (!holdingAxe)
         {
             _aimLine.positionCount = 0;
+            ReportAimHit(false);
             return;
         }
-
-        Vector3 origin = _aimOrigin != null ? _aimOrigin.position : transform.position + Vector3.up;
-        Vector3 direction = transform.forward;
-        Vector3 end = origin + direction * _aimDistance;
-
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, _aimDistance, _aimLayer, QueryTriggerInteraction.Ignore))
+        
+        // For debug purposes
+        if (_aimOrigin == null)
         {
-            end = hit.point;
+            _aimLine.positionCount = 0;
+            ReportAimHit(false);
+            return;
         }
+        
+
+        Vector3 origin = _aimOrigin.position;
+        Vector3 direction = transform.forward;
+        //Vector3 end = origin + direction * _aimDistance;
+
+        // _aimDistance goes in last var
+        bool hitObject = Physics.Raycast(origin, direction, out RaycastHit hit);
+
+        ReportAimHit(hitObject);
+
+        if (!hitObject)
+        {
+            _aimLine.positionCount = 0;
+            return;
+        }
+        
 
         _aimLine.positionCount = 2;
         _aimLine.SetPosition(0, origin);
-        _aimLine.SetPosition(1, end);
+        _aimLine.SetPosition(1, hit.point);
+    }
+    
+    // Just print whenever the line hits
+    void ReportAimHit(bool hitObject)
+    {
+        if (_hasAimHitState && _lastAimHit == hitObject) return;
+
+        _lastAimHit = hitObject;
+        _hasAimHitState = true;
+        Debug.Log($"Line hit object: {hitObject}");
     }
     
     void HandleInteractionPressed()

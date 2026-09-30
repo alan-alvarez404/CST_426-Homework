@@ -506,6 +506,15 @@ MonoBehaviour:
     m_Bits: 64
   _movementSpeed: 4
   _rotationSpeed: 360
+  _aimLine: {fileID: 1447521484990804271}
+  _aimOrigin: {fileID: 3208710921996878769}
+  _aimDistance: 10
+  _aimLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  throwImpulse: 25
+  returnDuration: 1
+  bowAmount: 0.5
 --- !u!114 &330018501001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -829,6 +838,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2594636939033437460}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3687160332295891937
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3208710921996878769}
+  m_Layer: 0
+  m_Name: AxeAimOrigin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3208710921996878769
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3687160332295891937}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7745727607755375033}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3760934785871057751
 GameObject:
@@ -1180,6 +1220,7 @@ Transform:
   - {fileID: 5790875462867126753}
   - {fileID: 3198261658288423369}
   - {fileID: 1351401235758572010}
+  - {fileID: 3208710921996878769}
   m_Father: {fileID: 1786789122831410079}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7232859167158745953
@@ -1872,6 +1913,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  playerController: {fileID: 0}
 --- !u!82 &1083908241827759264
 AudioSource:
   m_ObjectHideFlags: 0
