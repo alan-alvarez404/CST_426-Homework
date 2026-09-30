@@ -70,6 +70,7 @@ public class PlayerController : NetworkBehaviour
 
         if (upperBodyLayer >= 0)
             _animator.SetLayerWeight(upperBodyLayer, 1f);
+        Debug.Log($"Upper Body layer weight: " + $"{_animator.GetLayerWeight(upperBodyLayer)}");
     }
     
     void Update()
@@ -252,34 +253,49 @@ public class PlayerController : NetworkBehaviour
     // =================================================================================================================
     
     
-    // Function to handle the aiming visual when wielding an axe
+    // =================================================================================================================
+    // These are all the functions related to drawing the aiming line when wielding the axe
+    
+    // Switch statement with different states of the axe in the world (for drawing the aiming line visual)
     void UpdateAimVisual()
     {
         if (_aimLine == null) return;
 
-        bool holdingAxe = _heldItem.ObjectType == ObjectType.Axe;
-        if (!holdingAxe)
+        switch (_axeState)
+        {
+            case AxeState.Held:
+                DrawHeldAimLine();
+                break;
+
+            case AxeState.Away:
+                DrawReturnAimLine();
+                break;
+
+            default:
+                _aimLine.positionCount = 0;
+                break;
+        }
+    }
+    
+    // Drawing the aim line when axe is held
+    void DrawHeldAimLine()
+    {
+        if (_heldItem.ObjectType != ObjectType.Axe ||
+            _aimOrigin == null)
         {
             _aimLine.positionCount = 0;
             ReportAimHit(false);
             return;
         }
-        
-        // For debug purposes
-        if (_aimOrigin == null)
-        {
-            _aimLine.positionCount = 0;
-            ReportAimHit(false);
-            return;
-        }
-        
 
         Vector3 origin = _aimOrigin.position;
         Vector3 direction = transform.forward;
-        //Vector3 end = origin + direction * _aimDistance;
 
-        // _aimDistance goes in last var
-        bool hitObject = Physics.Raycast(origin, direction, out RaycastHit hit);
+        bool hitObject = Physics.Raycast(
+            origin,
+            direction,
+            out RaycastHit hit
+        );
 
         ReportAimHit(hitObject);
 
@@ -288,12 +304,47 @@ public class PlayerController : NetworkBehaviour
             _aimLine.positionCount = 0;
             return;
         }
-        
 
         _aimLine.positionCount = 2;
         _aimLine.SetPosition(0, origin);
         _aimLine.SetPosition(1, hit.point);
     }
+    
+    // The path that's drawn when the axe returns
+    void DrawReturnAimLine()
+    {
+        if (axe == null || !axe.gameObject.activeInHierarchy)
+        {
+            _aimLine.positionCount = 0;
+            return;
+        }
+
+        Vector3 start = axe.transform.position;
+        Vector3 end = axe.CatchPosition;
+        Vector3 middle =
+            (start + end) * 0.5f +
+            transform.right * bowAmount;
+
+        const int samples = 10;
+        _aimLine.positionCount = samples;
+
+        for (int i = 0; i < samples; i++)
+        {
+            float t = (float)i / (samples - 1);
+
+            Vector3 point =
+                QuadraticBezierMath.SamplePointBernstein(
+                    start,
+                    middle,
+                    end,
+                    t
+                );
+
+            _aimLine.SetPosition(i, point);
+        }
+    }
+    
+    // =================================================================================================================
     
     // Just print whenever the line hits
     void ReportAimHit(bool hitObject)
