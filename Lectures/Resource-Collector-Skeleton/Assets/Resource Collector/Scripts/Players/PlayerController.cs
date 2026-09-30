@@ -65,6 +65,11 @@ public class PlayerController : NetworkBehaviour
             _aimLine.useWorldSpace = true;
             _aimLine.positionCount = 0;
         }
+
+        int upperBodyLayer = _animator.GetLayerIndex("Upper Body");
+
+        if (upperBodyLayer >= 0)
+            _animator.SetLayerWeight(upperBodyLayer, 1f);
     }
     
     void Update()
@@ -87,7 +92,8 @@ public class PlayerController : NetworkBehaviour
         _animator.SetFloat("Speed", _characterController.velocity.magnitude);
 
         // Make sure the animator receives an update for the axe being held
-        _animator.SetBool("IsAxeHeld", _heldItem.ObjectType == ObjectType.Axe && _axeState == AxeState.Held);
+        bool axeIsHeldOrThrowing = _heldItem.ObjectType == ObjectType.Axe && (_axeState == AxeState.Held || _axeState == AxeState.Throwing);
+        _animator.SetBool("IsAxeHeld", axeIsHeldOrThrowing);
         
         UpdateInteractionTarget();
         UpdateAxeInput(); // For throwing the axe
@@ -133,23 +139,48 @@ public class PlayerController : NetworkBehaviour
     
     void UpdateAxeInput()
     {
-        if (_axeState == AxeState.Held && Keyboard.current.tKey.wasPressedThisFrame)
+        if (Keyboard.current.tKey.wasPressedThisFrame)
+        {
+            bool isAxeHeld = _animator.GetBool("IsAxeHeld");
+
+            Debug.Log(
+                $"T pressed | Owner: {IsOwner} | " +
+                $"Item: {_heldItem.ObjectType} | " +
+                $"Axe State: {_axeState} | " +
+                $"IsAxeHeld: {isAxeHeld}"
+            );
+        }
+
+        if (_axeState == AxeState.Held &&
+            _heldItem.ObjectType == ObjectType.Axe &&
+            Keyboard.current.tKey.wasPressedThisFrame)
         {
             _axeState = AxeState.Throwing;
             _animator.SetTrigger(ThrowHash);
+            Debug.Log("Throw trigger sent");
         }
 
-        if (_axeState == AxeState.Away && Mouse.current.rightButton.wasPressedThisFrame)
+        if (_axeState == AxeState.Away &&
+            Mouse.current.rightButton.wasPressedThisFrame)
+        {
             StartCoroutine(ReturnAxe());
+        }
     }
 
     public void LaunchAxe()
     {
-        if (_axeState != AxeState.Throwing) return;
+        Debug.Log($"LaunchAxe called. State: {_axeState}");
+
+        if (_axeState != AxeState.Throwing)
+        {
+            Debug.LogWarning("LaunchAxe stopped because the axe is not in Throwing state.");
+            return;
+        }
 
         Vector3 direction = transform.forward;
         direction.y = 0f;
         direction.Normalize();
+
         axe.Launch(direction, throwImpulse, _characterController);
         _axeState = AxeState.Away;
     }
