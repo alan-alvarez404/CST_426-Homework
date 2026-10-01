@@ -15,9 +15,12 @@ public class AnimationEvents : MonoBehaviour
 
     public void ThrowAction()
     {
+        if (!playerController.IsOwner)
+            return;
+        
         // Implement LaunchAxe then reenable this - Done :thumbs_up:
         Debug.Log("ThrowAction animation event fired");
-        playerController.LaunchAxe();
+        playerController.RequestLaunchAxeServerRpc();
     }
 
     public void ChopAction() { }

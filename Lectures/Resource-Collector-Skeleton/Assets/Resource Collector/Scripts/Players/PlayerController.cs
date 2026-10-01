@@ -37,13 +37,17 @@ public class PlayerController : NetworkBehaviour
     //[SerializeField] float _aimDistance = 10f;
     //[SerializeField] private LayerMask _aimLayer = ~0;
     
-    // TODO: Use these at some point
-    // These will be unused for now, but once I can get all the other necessary stuff from the throwing project we should be good
+    // Needed for throwing the axe
     [Header("Axe")] 
     public ThrownAxe axe;
     public float throwImpulse = 25f;
     public float returnDuration = 1f;
     public float bowAmount = 0.5f;
+    
+    // For syncing the axe across different players
+    [SerializeField] NetworkObject _thrownAxePrefab;
+    [SerializeField] Transform _axeHand;
+    ThrownAxe _activeThrownAxe;
 
     enum AxeState { Held, Throwing, Away, Returning }
     
@@ -156,8 +160,8 @@ public class PlayerController : NetworkBehaviour
             _heldItem.ObjectType == ObjectType.Axe &&
             Keyboard.current.tKey.wasPressedThisFrame)
         {
-            _axeState = AxeState.Throwing;
             _animator.SetTrigger(ThrowHash);
+            _axeState = AxeState.Throwing;
             Debug.Log("Throw trigger sent");
         }
 
@@ -182,7 +186,7 @@ public class PlayerController : NetworkBehaviour
         direction.y = 0f;
         direction.Normalize();
 
-        axe.Launch(direction, throwImpulse, _characterController);
+        _activeThrownAxe.Launch(direction, throwImpulse, _characterController, _axeHand);
         _axeState = AxeState.Away;
     }
 
@@ -449,6 +453,42 @@ public class PlayerController : NetworkBehaviour
         
         _closestTarget = null;
         
+    }
+    
+    // When throwing the newly spawned Axe object when thrown
+    [Rpc(SendTo.Server)]
+    public void RequestLaunchAxeServerRpc()
+    {
+        if (_heldItem.ObjectType != ObjectType.Axe)
+            return;
+
+        if (_activeThrownAxe != null)
+            return;
+
+        NetworkObject spawnedObject =
+            Instantiate(
+                _thrownAxePrefab,
+                _axeHand.position,
+                _axeHand.rotation
+            );
+
+        spawnedObject.Spawn();
+
+        _activeThrownAxe = spawnedObject.GetComponent<ThrownAxe>();
+
+        Vector3 direction = transform.forward;
+        direction.y = 0f;
+        direction.Normalize();
+
+        _activeThrownAxe.Launch(
+            direction,
+            throwImpulse,
+            _characterController,
+            _axeHand
+        );
+        
+        _axeState = AxeState.Away;
+        axe.gameObject.SetActive(false);
     }
 
     [Rpc(SendTo.Server)]

@@ -42,11 +42,11 @@ public class ThrownAxe : MonoBehaviour
 
     public Vector3 CatchPosition => _hand.TransformPoint(_heldLocalPosition);
 
-    public void Launch(Vector3 direction, float impulse, CharacterController thrower)
+    public void Launch(Vector3 direction, float impulse, CharacterController thrower, Transform hand) 
     {
-        _hand = transform.parent;
-        _heldLocalPosition = transform.localPosition;
-        _heldLocalRotation = transform.localRotation;
+        _hand = hand;
+        _heldLocalPosition = hand.InverseTransformPoint(transform.position);
+        _heldLocalRotation = Quaternion.Inverse(hand.rotation) * transform.rotation;
         
         // TODO Slice 4.1: hand the detached axe to physics. Right now it hangs in the air.
         // 1. Let physics move it and let it collide with the world.
