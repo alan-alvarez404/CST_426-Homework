@@ -48,6 +48,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] NetworkObject _thrownAxePrefab;
     [SerializeField] Transform _axeHand;
     ThrownAxe _activeThrownAxe;
+    readonly NetworkVariable<bool> _axeIsAway = new();
 
     enum AxeState { Held, Throwing, Away, Returning }
     
@@ -79,6 +80,8 @@ public class PlayerController : NetworkBehaviour
     
     void Update()
     {
+        ApplyAxeVisual();
+
         if (!IsOwner) return;
 
         // TODO Slice 2.2: read this owner's movement in Update. Done?
@@ -119,6 +122,9 @@ public class PlayerController : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
+        _axeIsAway.OnValueChanged += HandleAxeAwayChanged;
+        HandleAxeAwayChanged(false, _axeIsAway.Value);
+
         // TODO Slice 2.6: make the main camera follow only its local player. </> end of Slice 2
         if (IsOwner)
             Camera.main.GetComponent<FollowCamera>().Target = transform;
@@ -128,6 +134,8 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
+        _axeIsAway.OnValueChanged -= HandleAxeAwayChanged;
+
         if (IsOwner)
         {
             // TODO Slice 5.2: turn off the current target's Highlightable,
@@ -168,37 +176,31 @@ public class PlayerController : NetworkBehaviour
         if (_axeState == AxeState.Away &&
             Mouse.current.rightButton.wasPressedThisFrame)
         {
-            StartCoroutine(ReturnAxe());
+            RequestReturnAxeServerRpc();
         }
     }
 
     public void LaunchAxe()
     {
-        Debug.Log($"LaunchAxe called. State: {_axeState}");
+        if (!IsOwner) return;
 
-        if (_axeState != AxeState.Throwing)
-        {
-            Debug.LogWarning("LaunchAxe stopped because the axe is not in Throwing state.");
-            return;
-        }
-
-        Vector3 direction = transform.forward;
-        direction.y = 0f;
-        direction.Normalize();
-
-        _activeThrownAxe.Launch(direction, throwImpulse, _characterController, _axeHand);
-        _axeState = AxeState.Away;
+        RequestLaunchAxeServerRpc();
     }
 
-    IEnumerator ReturnAxe()
+    IEnumerator ReturnAxeServer()
     {
         _axeState = AxeState.Returning;
-        axe.rigidbody.isKinematic = true;
-        axe.axeCollider.enabled = false;
+
+        ThrownAxe returningAxe = _activeThrownAxe;
+        if (returningAxe == null)
+            yield break;
+
+        returningAxe.rigidbody.isKinematic = true;
+        returningAxe.axeCollider.enabled = false;
         // TODO Slice 8.3 (recall hook): start visual spin for the return.
         // Next: the Slice 8.3 catch hook in ThrownAxe.AttachToHand.
 
-        Vector3 start = axe.transform.position;
+        Vector3 start = returningAxe.transform.position;
         // TODO Slice 5.3: advance recall progress from 0 to 1 over returnDuration,
         // one step per frame, replacing the one-frame wait below.
         // The catch runs only after progress reaches 1.
@@ -221,11 +223,11 @@ public class PlayerController : NetworkBehaviour
         {
             float t = elapsed / returnDuration;
             Vector3 p0 = start;
-            Vector3 p2 = axe.CatchPosition;
+            Vector3 p2 = _axeHand.position;
             Vector3 p1 = (p0 + p2) * 0.5f + transform.right * bowAmount;
             
-            axe.transform.position = QuadraticBezierMath.SamplePointBernstein(p0, p1, p2, t);
-            axe.transform.Rotate(Vector3.forward, axe.spinSpeed * Time.deltaTime, Space.Self);
+            returningAxe.transform.position = QuadraticBezierMath.SamplePointBernstein(p0, p1, p2, t);
+            returningAxe.transform.Rotate(Vector3.forward, returningAxe.spinSpeed * Time.deltaTime, Space.Self);
             
             yield return null;
             elapsed += Time.deltaTime;
@@ -233,8 +235,28 @@ public class PlayerController : NetworkBehaviour
         }
         while (elapsed < returnDuration);
 
-        axe.AttachToHand();
+        NetworkObject thrownObject = returningAxe.GetComponent<NetworkObject>();
+        if (thrownObject != null && thrownObject.IsSpawned)
+            thrownObject.Despawn(true);
+
+        _activeThrownAxe = null;
+        _axeIsAway.Value = false;
         _axeState = AxeState.Held;
+    }
+
+    void ApplyAxeVisual()
+    {
+        if (axe == null || _heldItem == null)
+            return;
+
+        if (_heldItem.ObjectType == ObjectType.Axe)
+            axe.gameObject.SetActive(!_axeIsAway.Value);
+    }
+
+    void HandleAxeAwayChanged(bool previousValue, bool newValue)
+    {
+        _axeState = newValue ? AxeState.Away : AxeState.Held;
+        ApplyAxeVisual();
     }
 
     (Vector3 p0, Vector3 p1, Vector3 p2) GetReturnControlPoints(Vector3 start)
@@ -488,12 +510,24 @@ public class PlayerController : NetworkBehaviour
         );
         
         _axeState = AxeState.Away;
-        axe.gameObject.SetActive(false);
+        _axeIsAway.Value = true;
+    }
+
+    [Rpc(SendTo.Server)]
+    void RequestReturnAxeServerRpc()
+    {
+        if (!_axeIsAway.Value || _activeThrownAxe == null)
+            return;
+
+        StartCoroutine(ReturnAxeServer());
     }
 
     [Rpc(SendTo.Server)]
     void RequestInteractRpc(ulong networkObjectId)
     {
+        if (_axeIsAway.Value)
+            return;
+
         Debug.Log($"Requesting Interact on server for {networkObjectId}");
         
         // TODO Slice 6.3: look up networkObjectId in SpawnedObjects. If that
