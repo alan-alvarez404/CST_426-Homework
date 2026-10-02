@@ -84,6 +84,7 @@ public class ThrownAxe : MonoBehaviour
 
         // Particle effects turn on when flying through air
         _effects?.SetFlying(true);
+        _effects?.SetStuck(false); // Ambient particles are off when midair
 
         // TODO Slice 8.3 (launch hook): start visual spin.
         // Pair it with the contact hook below.
@@ -119,8 +120,9 @@ public class ThrownAxe : MonoBehaviour
         
         rigidbody.isKinematic = true;
         
-        // Particle effects finish when stuck into an object
+        // Particle effects when stuck into an object
         _effects?.SetFlying(false);
+        _effects?.SetStuck(true);
         _effects?.PlayImpactBurst();
         
         // TODO Slice 8.3 (contact hook): stop visual spin while stuck.

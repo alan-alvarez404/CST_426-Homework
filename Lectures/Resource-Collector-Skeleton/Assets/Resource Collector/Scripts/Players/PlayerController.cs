@@ -248,7 +248,7 @@ public class PlayerController : NetworkBehaviour
         returningAxeVfx?.PlayCatchBurst();
 
         // Particle burst display briefly before despawning thrown axe
-        yield return new WaitForSeconds(0.15f);
+        // yield return new WaitForSeconds(0.15f);
         
         NetworkObject thrownObject = returningAxe.GetComponent<NetworkObject>();
         if (thrownObject != null && thrownObject.IsSpawned)

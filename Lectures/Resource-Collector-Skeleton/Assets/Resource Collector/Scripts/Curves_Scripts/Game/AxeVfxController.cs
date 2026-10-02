@@ -13,6 +13,7 @@ public class AxeVfxController : NetworkBehaviour
 
     readonly NetworkVariable<bool> _isHeld = new();
     readonly NetworkVariable<bool> _isFlying = new();
+    readonly NetworkVariable<bool> _isStuck = new();
 
     void Awake()
     {
@@ -28,6 +29,7 @@ public class AxeVfxController : NetworkBehaviour
 
         _isHeld.OnValueChanged += OnStateChanged;
         _isFlying.OnValueChanged += OnStateChanged;
+        _isStuck.OnValueChanged += OnStateChanged;
 
         RefreshEffects();
     }
@@ -36,6 +38,7 @@ public class AxeVfxController : NetworkBehaviour
     {
         _isHeld.OnValueChanged -= OnStateChanged;
         _isFlying.OnValueChanged -= OnStateChanged;
+        _isStuck.OnValueChanged -= OnStateChanged;
 
         base.OnNetworkDespawn();
     }
@@ -46,6 +49,9 @@ public class AxeVfxController : NetworkBehaviour
             return;
 
         _isHeld.Value = held;
+
+        if (held)
+            _isStuck.Value = false;
     }
 
     public void SetFlying(bool flying)
@@ -54,6 +60,18 @@ public class AxeVfxController : NetworkBehaviour
             return;
 
         _isFlying.Value = flying;
+
+        // Once the axe starts moving again, it is no longer stuck
+        if (flying)
+            _isStuck.Value = false;
+    }
+
+    public void SetStuck(bool stuck)
+    {
+        if (!IsServer)
+            return;
+
+        _isStuck.Value = stuck;
     }
 
     public void PlayImpactBurst()
@@ -95,14 +113,18 @@ public class AxeVfxController : NetworkBehaviour
     {
         if (_trail != null)
         {
+            // The trail only appears while the axe is flying or returning
             _trail.emitting = _isFlying.Value;
 
             if (!_isFlying.Value)
                 _trail.Clear();
         }
 
-        // Ambient particles are active while held or flying.
-        bool ambientShouldPlay = _isHeld.Value || _isFlying.Value;
+        // Ambient particles remain active while held, flying, or stuck
+        bool ambientShouldPlay =
+            _isHeld.Value ||
+            _isFlying.Value ||
+            _isStuck.Value;
 
         if (_ambientParticles == null)
             return;
