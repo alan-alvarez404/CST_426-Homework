@@ -197,6 +197,9 @@ public class PlayerController : NetworkBehaviour
 
         returningAxe.rigidbody.isKinematic = true;
         returningAxe.axeCollider.enabled = false;
+        
+        returningAxe.SetFlying(true);
+        
         // TODO Slice 8.3 (recall hook): start visual spin for the return.
         // Next: the Slice 8.3 catch hook in ThrownAxe.AttachToHand.
 
@@ -235,6 +238,8 @@ public class PlayerController : NetworkBehaviour
         }
         while (elapsed < returnDuration);
 
+        returningAxe.SetFlying(false);
+        
         NetworkObject thrownObject = returningAxe.GetComponent<NetworkObject>();
         if (thrownObject != null && thrownObject.IsSpawned)
             thrownObject.Despawn(true);
@@ -242,6 +247,7 @@ public class PlayerController : NetworkBehaviour
         _activeThrownAxe = null;
         _axeIsAway.Value = false;
         _axeState = AxeState.Held;
+        
     }
 
     void ApplyAxeVisual()

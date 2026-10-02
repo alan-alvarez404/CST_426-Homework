@@ -12,8 +12,10 @@ public class ThrownAxe : MonoBehaviour
     public Collider axeCollider;
     
     public float spinSpeed = 1000f;
+    
+    [SerializeField] AxeVfxController _effects;
 
-    //bool stuck; - This was unused, gonna leave it here just in case.
+    // bool stuck; - This was unused, gonna leave it here just in case.
     Transform _hand;
     Vector3 _heldLocalPosition;
     Quaternion _heldLocalRotation;
@@ -21,6 +23,9 @@ public class ThrownAxe : MonoBehaviour
     // Ensure the axe starts as kinematic and its collider disabled
     void Awake()
     {
+        if (_effects == null)
+            _effects = GetComponent<AxeVfxController>();
+        
         if (rigidbody == null)
             rigidbody = GetComponent<Rigidbody>();
 
@@ -29,6 +34,12 @@ public class ThrownAxe : MonoBehaviour
 
         rigidbody.isKinematic = true;
         axeCollider.enabled = false;
+    }
+    
+    // Called in the coroutine bit
+    public void SetFlying(bool flying)
+    {
+        _effects?.SetFlying(flying);
     }
     
     // TODO Slice 8.1: give Assets/Curves/Prefabs/Axe.prefab a visual child that can rotate
@@ -66,6 +77,8 @@ public class ThrownAxe : MonoBehaviour
         rigidbody.AddForce(direction * impulse, ForceMode.Impulse);
         rigidbody.AddTorque(transform.forward * (-spinSpeed * Mathf.Deg2Rad), ForceMode.VelocityChange);
 
+        // Particle effects turn on when flying through air
+        _effects?.SetFlying(true);
 
         // TODO Slice 8.3 (launch hook): start visual spin.
         // Pair it with the contact hook below.
@@ -78,6 +91,9 @@ public class ThrownAxe : MonoBehaviour
         transform.SetLocalPositionAndRotation(_heldLocalPosition, _heldLocalRotation);
         rigidbody.isKinematic = true;
         axeCollider.enabled = false;
+        
+        // Stop trail effect
+        _effects?.SetFlying(false);
 
         // TODO Slice 8.3 (catch hook): stop the spin and restore the held look.
         // Check: throw and recall both spin. Two full cycles end with the original held look.
@@ -97,6 +113,9 @@ public class ThrownAxe : MonoBehaviour
         // if (collision.collider.GetComponentInParent<PlayerController>() == null) return;
         
         rigidbody.isKinematic = true;
+        
+        // Particle effects finish when stuck into an object
+        _effects?.SetFlying(false);
         
         // TODO Slice 8.3 (contact hook): stop visual spin while stuck.
     }

@@ -101,6 +101,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e3ee26d99f87a743952fac7c150345e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 870129228724267537}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e3ee26d99f87a743952fac7c150345e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8042649937311968902}
   m_SourcePrefab: {fileID: 100100000, guid: 1e3ee26d99f87a743952fac7c150345e, type: 3}
 --- !u!1 &5796453865171121037 stripped
 GameObject:
@@ -170,6 +173,7 @@ MonoBehaviour:
   rigidbody: {fileID: 7767471524070609690}
   axeCollider: {fileID: 6260305339311961266}
   spinSpeed: 1000
+  _effects: {fileID: 0}
 --- !u!96 &1232991594971918414
 TrailRenderer:
   serializedVersion: 4
@@ -196,7 +200,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: a44aa5338703ca34784e41c4d0a7e762, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -219,11 +223,11 @@ TrailRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Time: 5
+  m_Time: 0.5
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 0.45
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -236,12 +240,21 @@ TrailRenderer:
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0, g: 1, b: 0.926336, a: 1}
+      key0: {r: 0, g: 1, b: 1, a: 1}
       key1: {r: 1, g: 1, b: 1, a: 0}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
@@ -270,7 +283,7 @@ TrailRenderer:
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
-    numCapVertices: 0
+    numCapVertices: 1
     alignment: 0
     textureMode: 0
     textureScale: {x: 1, y: 1}
@@ -278,7 +291,7 @@ TrailRenderer:
     generateLightingData: 0
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
-  m_Emitting: 0
+  m_Emitting: 1
   m_ApplyActiveColorSpace: 1
 --- !u!114 &-7747052477147094746
 MonoBehaviour:
@@ -370,3 +383,17 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
+--- !u!114 &-8042649937311968902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5796453865171121037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec1718d2b5b1b0748ba5727d36857b3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AxeVfController
+  ShowTopMostFoldoutHeaderGroup: 1
+  _trail: {fileID: 1232991594971918414}
