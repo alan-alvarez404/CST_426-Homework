@@ -42,6 +42,11 @@ public class ThrownAxe : MonoBehaviour
         _effects?.SetFlying(flying);
     }
     
+    public void SetHeld(bool held)
+    {
+        _effects?.SetHeld(held);
+    }
+    
     // TODO Slice 8.1: give Assets/Curves/Prefabs/Axe.prefab a visual child that can rotate
     // on its own, separate from the physics root. Keep its look and collision the same.
     // Check: the held axe looks the same, and throw and catch still work.
@@ -116,6 +121,7 @@ public class ThrownAxe : MonoBehaviour
         
         // Particle effects finish when stuck into an object
         _effects?.SetFlying(false);
+        _effects?.PlayImpactBurst();
         
         // TODO Slice 8.3 (contact hook): stop visual spin while stuck.
     }

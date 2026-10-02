@@ -3,8 +3,15 @@ using UnityEngine;
 
 public class AxeVfxController : NetworkBehaviour
 {
+    [Header("Trail")]
     [SerializeField] TrailRenderer _trail;
 
+    [Header("Particles")]
+    [SerializeField] ParticleSystem _ambientParticles;
+    [SerializeField] ParticleSystem _impactParticles;
+    [SerializeField] ParticleSystem _catchParticles;
+
+    readonly NetworkVariable<bool> _isHeld = new();
     readonly NetworkVariable<bool> _isFlying = new();
 
     void Awake()
@@ -12,21 +19,33 @@ public class AxeVfxController : NetworkBehaviour
         if (_trail == null)
             _trail = GetComponent<TrailRenderer>();
 
-        SetTrail(false);
+        StopAllEffects();
     }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
-        _isFlying.OnValueChanged += HandleFlightStateChanged;
-        HandleFlightStateChanged(false, _isFlying.Value);
+        _isHeld.OnValueChanged += OnStateChanged;
+        _isFlying.OnValueChanged += OnStateChanged;
+
+        RefreshEffects();
     }
 
     public override void OnNetworkDespawn()
     {
-        _isFlying.OnValueChanged -= HandleFlightStateChanged;
+        _isHeld.OnValueChanged -= OnStateChanged;
+        _isFlying.OnValueChanged -= OnStateChanged;
+
         base.OnNetworkDespawn();
+    }
+
+    public void SetHeld(bool held)
+    {
+        if (!IsServer)
+            return;
+
+        _isHeld.Value = held;
     }
 
     public void SetFlying(bool flying)
@@ -37,19 +56,101 @@ public class AxeVfxController : NetworkBehaviour
         _isFlying.Value = flying;
     }
 
-    void HandleFlightStateChanged(bool previousValue, bool newValue)
+    public void PlayImpactBurst()
     {
-        SetTrail(newValue);
-    }
-
-    void SetTrail(bool enabled)
-    {
-        if (_trail == null)
+        if (!IsServer)
             return;
 
-        _trail.emitting = enabled;
+        PlayImpactBurstClientRpc();
+    }
 
-        if (!enabled)
+    public void PlayCatchBurst()
+    {
+        if (!IsServer)
+            return;
+
+        PlayCatchBurstClientRpc();
+    }
+
+    [ClientRpc]
+    void PlayImpactBurstClientRpc()
+    {
+        if (_impactParticles != null)
+            _impactParticles.Play(true);
+    }
+
+    [ClientRpc]
+    void PlayCatchBurstClientRpc()
+    {
+        if (_catchParticles != null)
+            _catchParticles.Play(true);
+    }
+
+    void OnStateChanged(bool previousValue, bool newValue)
+    {
+        RefreshEffects();
+    }
+
+    void RefreshEffects()
+    {
+        if (_trail != null)
+        {
+            _trail.emitting = _isFlying.Value;
+
+            if (!_isFlying.Value)
+                _trail.Clear();
+        }
+
+        // Ambient particles are active while held or flying.
+        bool ambientShouldPlay = _isHeld.Value || _isFlying.Value;
+
+        if (_ambientParticles == null)
+            return;
+
+        if (ambientShouldPlay)
+        {
+            if (!_ambientParticles.isPlaying)
+                _ambientParticles.Play(true);
+        }
+        else
+        {
+            _ambientParticles.Stop(
+                true,
+                ParticleSystemStopBehavior.StopEmittingAndClear
+            );
+        }
+    }
+
+    void StopAllEffects()
+    {
+        if (_trail != null)
+        {
+            _trail.emitting = false;
             _trail.Clear();
+        }
+
+        if (_ambientParticles != null)
+        {
+            _ambientParticles.Stop(
+                true,
+                ParticleSystemStopBehavior.StopEmittingAndClear
+            );
+        }
+
+        if (_impactParticles != null)
+        {
+            _impactParticles.Stop(
+                true,
+                ParticleSystemStopBehavior.StopEmittingAndClear
+            );
+        }
+
+        if (_catchParticles != null)
+        {
+            _catchParticles.Stop(
+                true,
+                ParticleSystemStopBehavior.StopEmittingAndClear
+            );
+        }
     }
 }

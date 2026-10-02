@@ -195,10 +195,13 @@ public class PlayerController : NetworkBehaviour
         if (returningAxe == null)
             yield break;
 
+        AxeVfxController returningAxeVfx = returningAxe.GetComponent<AxeVfxController>();
+        
         returningAxe.rigidbody.isKinematic = true;
         returningAxe.axeCollider.enabled = false;
         
-        returningAxe.SetFlying(true);
+        // Axe is flying back to player, trail and flying particles stay active
+        returningAxeVfx?.SetFlying(true);
         
         // TODO Slice 8.3 (recall hook): start visual spin for the return.
         // Next: the Slice 8.3 catch hook in ThrownAxe.AttachToHand.
@@ -238,7 +241,14 @@ public class PlayerController : NetworkBehaviour
         }
         while (elapsed < returnDuration);
 
-        returningAxe.SetFlying(false);
+        // Axe has reached player's hand
+        returningAxeVfx?.SetFlying(false);
+
+        // Particle burst when axe is caught
+        returningAxeVfx?.PlayCatchBurst();
+
+        // Particle burst display briefly before despawning thrown axe
+        yield return new WaitForSeconds(0.15f);
         
         NetworkObject thrownObject = returningAxe.GetComponent<NetworkObject>();
         if (thrownObject != null && thrownObject.IsSpawned)
@@ -503,6 +513,14 @@ public class PlayerController : NetworkBehaviour
         spawnedObject.Spawn();
 
         _activeThrownAxe = spawnedObject.GetComponent<ThrownAxe>();
+        
+        AxeVfxController thrownAxeVfx = spawnedObject.GetComponent<AxeVfxController>();
+
+        // Axe is leaving player's hand, stop held particle state
+        thrownAxeVfx?.SetHeld(false);
+        
+        // Axe leaves player's hand, enable trail and flying particles
+        thrownAxeVfx?.SetFlying(true);
 
         Vector3 direction = transform.forward;
         direction.y = 0f;
