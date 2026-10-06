@@ -22,17 +22,31 @@ public class SplineFollow : MonoBehaviour
         {
             // TODO: Advance distance by speed over the frame and look up u for that distance.
             // Stop at TotalLength.
+            _distance = Mathf.Min(_distance + Mathf.Max(0f, speed) * Time.deltaTime, path.TotalLength);
+            _u = path.ParameterAtDistance(_distance);
         }
         else
         {
             // TODO: Advance u in equal steps, paced so the trip takes as long as the distance
             // trip at the same speed. Stop at SegmentCount.
-        }
+            if (path.TotalLength > Mathf.Epsilon)
+            {
+                float uSpeed = Mathf.Max(0f, speed) * path.SegmentCount / path.TotalLength;
+                _u = Mathf.Min(_u + uSpeed * Time.deltaTime, path.SegmentCount);
+            }
+            else
+            {
+                _u = 0f;
+            }}
 
         // TODO: Place this object at the path point for u. Replay should return it to the start.
-
+        transform.position = path.SamplePoint(_u);
+        Vector3 direction = faceTarget && target != null ? target.position - transform.position : path.SampleTangent(_u);
+        
         // TODO: Look at the target if faceTarget is on, otherwise along the path tangent.
         // Use world up so the horizon stays level.
+        if (direction.sqrMagnitude > Mathf.Epsilon)
+            transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
     }
 
     public void Restart()

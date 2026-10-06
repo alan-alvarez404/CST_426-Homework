@@ -66,7 +66,6 @@ public class SplinePath : MonoBehaviour
 
         
         return CubicBezierMath.SampleTangent(p0, p1, p2, p3, t);
-        return Vector3.zero;
     }
 
     // Walk the path once at equal steps in u and add up the chords.
@@ -86,7 +85,7 @@ public class SplinePath : MonoBehaviour
         
         _distanceTable.Add(new DistanceRow() {u = 0, distance = 0f});
         
-        for (int i = 1; i < samplesPerSegment * SegmentCount; i++)
+        for (int i = 1; i <= samplesPerSegment * SegmentCount; i++)
         {
             u += du;
 
@@ -107,7 +106,27 @@ public class SplinePath : MonoBehaviour
     {
         // TODO: Return the u at a distance along the path. Interpolate u (not position)
         // between the two rows around it.
-        return 0f;
+        
+        int lastIndex = _distanceTable.Count - 1;
+        if (distance >= _distanceTable[lastIndex].distance) return _distanceTable[lastIndex].u;
+        
+        for (int i = 1; i < _distanceTable.Count; i++)
+        {
+            DistanceRow previous = _distanceTable[i - 1];
+            DistanceRow next = _distanceTable[i];
+
+            if (distance <= next.distance)
+            {
+                float denominator = next.distance - previous.distance;
+                if (denominator <= Mathf.Epsilon)
+                    return next.u;
+
+                float fraction = (distance - previous.distance) / denominator;
+                return Mathf.Lerp(previous.u, next.u, fraction);
+            }
+        }
+        
+        return _distanceTable[lastIndex].u;
     }
 
     void OnDrawGizmos()
