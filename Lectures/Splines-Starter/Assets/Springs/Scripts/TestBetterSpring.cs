@@ -24,12 +24,14 @@ public class TestBetterSpring : MonoBehaviour
     void Update()
     {
         // Step the spring in fixed 1/120 s chunks, however long the frame was.
-        _stepTime += Time.deltaTime;
-        while (_stepTime >= FixedStep)
-        {
-            SimulateSpring(FixedStep);
-            _stepTime -= FixedStep;
-        }
+        // _stepTime += Time.deltaTime;
+        // while (_stepTime >= FixedStep)
+        // {
+        //     SimulateSpring(FixedStep);
+        //     _stepTime -= FixedStep;
+        // }
+        // UpdateVisuals();
+        SimulateSpring(Time.deltaTime);
         UpdateVisuals();
     }
 
@@ -39,13 +41,15 @@ public class TestBetterSpring : MonoBehaviour
 
         // TODO: Turn frequencyHz into a stiffness for this mass, so changing the mass does not
         // change the motion.
+        float omega = 2f * Mathf.PI * frequencyHz;
+        float stiffness = mass * omega * omega;
 
         // TODO: Turn dampingRatio into a damping, as a fraction of critical damping.
         // Treat a negative damping ratio as 0.
 
         // TODO: Add the restoring and damping forces, find the acceleration, and take a
         // semi-implicit Euler step. Keep the velocity in a private _velocity field.
-        
+
         // attachmentTransform.position = ;
     }
 
