@@ -111,7 +111,7 @@ public class RoadMeshGeneratorStarter : MonoBehaviour
             int nextTopRight = nextRung + 3;
             
             // Top surface of the road mesh
-            AddQuad(triangles, bottomLeft, bottomRight, nextBottomLeft, nextBottomRight);
+            AddQuad(triangles, topLeft, nextTopLeft,topRight, nextTopRight);
             
             // Only if the road will have a thickness greater than zero
             // If not just render the top part
